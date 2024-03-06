@@ -1,0 +1,34 @@
+TODO: Информация
+Rate Limiter - ограничивает наш сервис по трафику. Т.е мы ему задаем целевой показатель и если
+кол-во RPS превышает его, то мы срезаем лишние запросы (они отваливаются по ошибке), а остальные
+которые влезают в этот лимит попадают.
+
+К примеру, мы ставим ограничение 10 RPS в течении секунды. То мы можем гарантировать, что в наш
+сервис не поступит больше 10 RPS в течении секунды.
+
+Пример 10 RPS в течении секунды:
+rate_limiter.NewTokenBucketLimiter(ctx, 10, time.Second)
+
+TODO: Подключение
+1) Перейти в internal/app/app.go
+2) В методе initGRPCServer пишем:
+
+func (a *App) initGRPCServer(ctx context.Context) error {
+	rateLimiter := rate_limiter.NewTokenBucketLimiter(ctx, 10, time.Second) // подключаем rate_limiter (ограничение 10 rps в течении секунды)
+
+	a.grpcServer = grpc.NewServer(
+		grpc.Creds(insecure.NewCredentials()),
+		grpc.UnaryInterceptor(
+			grpcMiddleware.ChainUnaryServer(
+				interceptor.LogInterceptor,
+				interceptor.NewRateLimiterInterceptor(rateLimiter).Unary, // подключаем интерсептор
+			),
+		),
+	)
+
+	reflection.Register(a.grpcServer)
+
+	desc.RegisterNoteV1Server(a.grpcServer, a.serviceProvider.NoteImpl(ctx))
+
+	return nil
+}

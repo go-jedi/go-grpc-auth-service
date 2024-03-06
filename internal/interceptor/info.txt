@@ -1,0 +1,144 @@
+TODO: logger.go - перехватчик для логирования
+
+TODO: rate_limiter.go - перехватчик для Rate Limiter
+
+TODO: circuit_breaker.go - перехватчик для Circuit Breaker:
+Circuit Breaker - компонент, который при соблюдении какого то условия которое мы укажем он\
+отбрасывает все входящие запросы до какого-то промежутка времени (который мы укажем).
+У него есть 3 стадии:
+    - открытое (не пускает никого)
+    - полу-открытое (пускает, но с ограничением на кол-во FPS)
+    - закрытое (пускает всех)
+
+Подключение:
+1) Перейти в internal/app/app.go
+2) В методе initGRPCServer пишем:
+
+func (a *App) initGRPCServer(ctx context.Context) error {
+	rateLimiter := rate_limiter.NewTokenBucketLimiter(ctx, 10, time.Second)
+
+	cb := gobreaker.NewCircuitBreaker(gobreaker.Settings{ // Создаем Circuit breaker
+		Name:        "my-service",    // Имя сервиса, где запускаем Circuit breaker
+		MaxRequests: 3,               // Максимально кол-во запросов, которые могут проходить через Circuit breaker когда он в полуоткрытом состоянии
+		Timeout:     5 * time.Second, // Период открытой стадии Circuit breaker. Если 5 секунд проходит, то он переходит в полуоткрытое состояние и затем через 5 секунд в закрытое или наоборот
+		ReadyToTrip: func(counts gobreaker.Counts) bool { // Ф-ция по какому условию Circuit breaker должен перейти в открытое состояние
+			failureRatio := float64(counts.TotalFailures) / float64(counts.Requests)
+			return failureRatio >= 0.6 // Если количество запросов ошибочных относительно общего кол-ва больше или равно 60 %, то открывается Circuit breaker
+		},
+		OnStateChange: func(name string, from gobreaker.State, to gobreaker.State) { // Ф-ция когда Circuit breaker будем менять свое состояние
+			logger.Warn(fmt.Sprintf("Circuit Breaker: %s, changed from %v, to %v\n", name, from, to))
+		},
+	})
+
+	a.grpcServer = grpc.NewServer(
+		grpc.Creds(insecure.NewCredentials()),
+		grpc.UnaryInterceptor(
+			grpcMiddleware.ChainUnaryServer(
+				interceptor.LogInterceptor,
+				interceptor.NewRateLimiterInterceptor(rateLimiter).Unary,
+				interceptor.NewCircuitBreakerInterceptor(cb).Unary,       // подключаем interceptor circuit breaker
+			),
+		),
+	)
+
+	reflection.Register(a.grpcServer)
+
+	desc.RegisterNoteV1Server(a.grpcServer, a.serviceProvider.NoteImpl(ctx))
+
+	return nil
+}
+
+TODO: error.go - перехватчик для обработки ошибок (кастомный):
+Примеры использования:
+validate.NewValidationErrors("id must be greater than 100")
+sys.NewCommonError("id must be less than 100", codes.ResourceExhausted)
+
+Подключение:
+1) Перейти в internal/app/app.go
+2) В методе initGRPCServer пишем:
+
+func (a *App) initGRPCServer(ctx context.Context) error {
+	rateLimiter := rate_limiter.NewTokenBucketLimiter(ctx, 10, time.Second)
+
+	cb := gobreaker.NewCircuitBreaker(gobreaker.Settings{
+		Name:        "my-service",
+		MaxRequests: 3,
+		Timeout:     5 * time.Second,
+		ReadyToTrip: func(counts gobreaker.Counts) bool {
+			failureRatio := float64(counts.TotalFailures) / float64(counts.Requests)
+			return failureRatio >= 0.6
+		},
+		OnStateChange: func(name string, from gobreaker.State, to gobreaker.State) {
+			logger.Warn(fmt.Sprintf("Circuit Breaker: %s, changed from %v, to %v\n", name, from, to))
+		},
+	})
+
+	a.grpcServer = grpc.NewServer(
+		grpc.Creds(insecure.NewCredentials()),
+		grpc.UnaryInterceptor(
+			grpcMiddleware.ChainUnaryServer(
+				interceptor.LogInterceptor,
+				interceptor.NewRateLimiterInterceptor(rateLimiter).Unary,
+				interceptor.NewCircuitBreakerInterceptor(cb).Unary,
+				interceptor.ErrorCodesInterceptor, // подключаем interceptor для обработки ошибок
+			),
+		),
+	)
+
+	reflection.Register(a.grpcServer)
+
+	desc.RegisterNoteV1Server(a.grpcServer, a.serviceProvider.NoteImpl(ctx))
+
+	return nil
+}
+
+TODO: server_tracing.go - серверные трейсы (для выстраивания траектории движения запроса):
+трейсы - нужны для определения прохождения запроса. Т.е прокидывается информация по всему
+хожу следования запроса и благодаря которой специальная утилита будет выстраивать траекторию
+движения запроса.
+
+Подключение:
+1) Перейти в internal/app/app.go
+2) Пишем:
+
+func (a *App) initTracing(_ context.Context) error {
+	tracing.Init(a.serviceProvider.ServiceNameConfig().Service())
+	logger.Info("Tracing is running")
+	return nil
+}
+
+func (a *App) initGRPCServer(ctx context.Context) error {
+	rateLimiter := rate_limiter.NewTokenBucketLimiter(ctx, 10, time.Second)
+
+    cb := gobreaker.NewCircuitBreaker(gobreaker.Settings{
+        Name:        "my-service",
+        MaxRequests: 3,
+        Timeout:     5 * time.Second,
+        ReadyToTrip: func(counts gobreaker.Counts) bool {
+            failureRatio := float64(counts.TotalFailures) / float64(counts.Requests)
+            return failureRatio >= 0.6
+        },
+        OnStateChange: func(name string, from gobreaker.State, to gobreaker.State) {
+            logger.Warn(fmt.Sprintf("Circuit Breaker: %s, changed from %v, to %v\n", name, from, to))
+        },
+    })
+
+	a.grpcServer = grpc.NewServer(
+		grpc.Creds(insecure.NewCredentials()),
+		grpc.UnaryInterceptor(
+			grpcMiddleware.ChainUnaryServer(
+				interceptor.LogInterceptor,
+				interceptor.ServerTracingInterceptor,        // подключаем interceptor для трейсинга серверного
+				interceptor.NewRateLimiterInterceptor(rateLimiter).Unary,
+				interceptor.NewCircuitBreakerInterceptor(cb).Unary,
+				interceptor.ErrorCodesInterceptor,
+			),
+		),
+	)
+
+	reflection.Register(a.grpcServer)
+
+	desc.RegisterNoteV1Server(a.grpcServer, a.serviceProvider.NoteImpl(ctx))
+
+	return nil
+}
