@@ -19,6 +19,7 @@ import (
 
 func TestGetUserByUsername(t *testing.T) {
 	t.Parallel()
+
 	// Arrange
 	type authRepositoryMockFunc func(mc *gomock.Controller) repository.AuthRepository
 
