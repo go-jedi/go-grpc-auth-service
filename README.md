@@ -1,2 +1,1 @@
-# go-grpc-clean-architecture
-# go-grpc-auth-service
+# gRPC authorization service on Golang
