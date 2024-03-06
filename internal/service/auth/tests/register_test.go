@@ -10,15 +10,15 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/go-jedi/auth-service/internal/model"
-	"github.com/go-jedi/auth-service/internal/repository"
+	"github.com/go-jedi/auth-service/internal/service"
 
-	repoMocks "github.com/go-jedi/auth-service/internal/repository/mocks"
+	serviceMocks "github.com/go-jedi/auth-service/internal/service/mocks"
 )
 
 func TestRegister(t *testing.T) {
 	t.Parallel()
 	// Arrange
-	type authRepositoryMockFunc func(mc *gomock.Controller) repository.AuthRepository
+	type authServiceMockFunc func(mc *gomock.Controller) service.AuthService
 
 	mc := gomock.NewController(t)
 	defer mc.Finish()
@@ -34,7 +34,7 @@ func TestRegister(t *testing.T) {
 		username = gofakeit.Animal()
 		password = gofakeit.Password(true, true, true, true, false, 32)
 
-		repoErr = fmt.Errorf("repository error")
+		serviceErr = fmt.Errorf("service error")
 
 		registerRequest = &model.RegisterRequest{
 			Username: username,
@@ -43,10 +43,10 @@ func TestRegister(t *testing.T) {
 	)
 
 	tests := []struct {
-		name                   string
-		input                  input
-		expected               error
-		authRepositoryMockFunc authRepositoryMockFunc
+		name                string
+		input               input
+		expected            error
+		authServiceMockFunc authServiceMockFunc
 	}{
 		{
 			name: "OK (Register)",
@@ -55,8 +55,8 @@ func TestRegister(t *testing.T) {
 				registerRequest: registerRequest,
 			},
 			expected: nil,
-			authRepositoryMockFunc: func(mc *gomock.Controller) repository.AuthRepository {
-				mock := repoMocks.NewMockAuthRepository(mc)
+			authServiceMockFunc: func(mc *gomock.Controller) service.AuthService {
+				mock := serviceMocks.NewMockAuthService(mc)
 				mock.EXPECT().Register(ctx, registerRequest).Return(nil)
 				return mock
 			},
@@ -67,10 +67,10 @@ func TestRegister(t *testing.T) {
 				ctx:             ctx,
 				registerRequest: registerRequest,
 			},
-			expected: repoErr,
-			authRepositoryMockFunc: func(mc *gomock.Controller) repository.AuthRepository {
-				mock := repoMocks.NewMockAuthRepository(mc)
-				mock.EXPECT().Register(ctx, registerRequest).Return(repoErr)
+			expected: serviceErr,
+			authServiceMockFunc: func(mc *gomock.Controller) service.AuthService {
+				mock := serviceMocks.NewMockAuthService(mc)
+				mock.EXPECT().Register(ctx, registerRequest).Return(serviceErr)
 				return mock
 			},
 		},
@@ -80,8 +80,8 @@ func TestRegister(t *testing.T) {
 		test := test
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
-			authRepositoryMock := test.authRepositoryMockFunc(mc)
-			err := authRepositoryMock.Register(test.input.ctx, test.input.registerRequest)
+			authServiceMock := test.authServiceMockFunc(mc)
+			err := authServiceMock.Register(test.input.ctx, test.input.registerRequest)
 
 			//	Assert
 			require.Equal(t, test.expected, err)

@@ -7,12 +7,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/brianvoe/gofakeit/v6"
+	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/go-jedi/auth-service/internal/model"
 	"github.com/go-jedi/auth-service/internal/repository"
-	"github.com/golang/mock/gomock"
 
 	repoMocks "github.com/go-jedi/auth-service/internal/repository/mocks"
 )

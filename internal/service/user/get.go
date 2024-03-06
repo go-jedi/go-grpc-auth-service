@@ -3,9 +3,9 @@ package user
 import (
 	"context"
 
-	"github.com/go-jedi/auth-service/internal/logger"
 	"go.uber.org/zap"
 
+	"github.com/go-jedi/auth-service/internal/logger"
 	"github.com/go-jedi/auth-service/internal/model"
 )
 

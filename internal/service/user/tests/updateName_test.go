@@ -10,15 +10,15 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/go-jedi/auth-service/internal/model"
-	"github.com/go-jedi/auth-service/internal/repository"
+	"github.com/go-jedi/auth-service/internal/service"
 
-	repoMocks "github.com/go-jedi/auth-service/internal/repository/mocks"
+	serviceMocks "github.com/go-jedi/auth-service/internal/service/mocks"
 )
 
 func TestUpdateName(t *testing.T) {
 	t.Parallel()
-	//	 Arrange
-	type userRepositoryMockFunc func(mc *gomock.Controller) repository.UserRepository
+	// Arrange
+	type userServiceMockFunc func(mc *gomock.Controller) service.UserService
 
 	mc := gomock.NewController(t)
 	defer mc.Finish()
@@ -34,7 +34,7 @@ func TestUpdateName(t *testing.T) {
 		id       = gofakeit.Int64()
 		username = gofakeit.Animal()
 
-		repoErr = fmt.Errorf("repository error")
+		serviceErr = fmt.Errorf("service error")
 
 		updateNameRequest = &model.UpdateNameRequest{
 			ID:       id,
@@ -43,10 +43,10 @@ func TestUpdateName(t *testing.T) {
 	)
 
 	tests := []struct {
-		name                   string
-		input                  input
-		expected               error
-		userRepositoryMockFunc userRepositoryMockFunc
+		name                string
+		input               input
+		expected            error
+		userServiceMockFunc userServiceMockFunc
 	}{
 		{
 			name: "OK (UpdateName)",
@@ -55,8 +55,8 @@ func TestUpdateName(t *testing.T) {
 				updateNameRequest: updateNameRequest,
 			},
 			expected: nil,
-			userRepositoryMockFunc: func(mc *gomock.Controller) repository.UserRepository {
-				mock := repoMocks.NewMockUserRepository(mc)
+			userServiceMockFunc: func(mc *gomock.Controller) service.UserService {
+				mock := serviceMocks.NewMockUserService(mc)
 				mock.EXPECT().UpdateName(ctx, updateNameRequest).Return(nil)
 				return mock
 			},
@@ -67,10 +67,10 @@ func TestUpdateName(t *testing.T) {
 				ctx:               ctx,
 				updateNameRequest: updateNameRequest,
 			},
-			expected: repoErr,
-			userRepositoryMockFunc: func(*gomock.Controller) repository.UserRepository {
-				mock := repoMocks.NewMockUserRepository(mc)
-				mock.EXPECT().UpdateName(ctx, updateNameRequest).Return(repoErr)
+			expected: serviceErr,
+			userServiceMockFunc: func(mc *gomock.Controller) service.UserService {
+				mock := serviceMocks.NewMockUserService(mc)
+				mock.EXPECT().UpdateName(ctx, updateNameRequest).Return(serviceErr)
 				return mock
 			},
 		},
@@ -80,8 +80,8 @@ func TestUpdateName(t *testing.T) {
 		test := test
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
-			userRepositoryMock := test.userRepositoryMockFunc(mc)
-			err := userRepositoryMock.UpdateName(test.input.ctx, test.input.updateNameRequest)
+			userServiceMock := test.userServiceMockFunc(mc)
+			err := userServiceMock.UpdateName(test.input.ctx, test.input.updateNameRequest)
 
 			//	Assert
 			require.Equal(t, test.expected, err)

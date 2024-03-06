@@ -12,15 +12,15 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/go-jedi/auth-service/internal/model"
-	"github.com/go-jedi/auth-service/internal/repository"
+	"github.com/go-jedi/auth-service/internal/service"
 
-	repoMocks "github.com/go-jedi/auth-service/internal/repository/mocks"
+	serviceMocks "github.com/go-jedi/auth-service/internal/service/mocks"
 )
 
 func TestGet(t *testing.T) {
 	t.Parallel()
-	//	 Arrange
-	type userRepositoryMockFunc func(mc *gomock.Controller) repository.UserRepository
+	// Arrange
+	type userServiceMockFunc func(mc *gomock.Controller) service.UserService
 
 	mc := gomock.NewController(t)
 	defer mc.Finish()
@@ -37,7 +37,7 @@ func TestGet(t *testing.T) {
 		username = gofakeit.Animal()
 		password = gofakeit.Password(true, true, true, true, false, 32)
 
-		repoErr = fmt.Errorf("repository error")
+		serviceErr = fmt.Errorf("service error")
 
 		expected = &model.User{
 			ID:                   id,
@@ -50,11 +50,11 @@ func TestGet(t *testing.T) {
 	)
 
 	tests := []struct {
-		name                   string
-		input                  input
-		expected               *model.User
-		err                    error
-		userRepositoryMockFunc userRepositoryMockFunc
+		name                string
+		input               input
+		expected            *model.User
+		err                 error
+		userServiceMockFunc userServiceMockFunc
 	}{
 		{
 			name: "OK (Get)",
@@ -64,8 +64,8 @@ func TestGet(t *testing.T) {
 			},
 			expected: expected,
 			err:      nil,
-			userRepositoryMockFunc: func(mc *gomock.Controller) repository.UserRepository {
-				mock := repoMocks.NewMockUserRepository(mc)
+			userServiceMockFunc: func(mc *gomock.Controller) service.UserService {
+				mock := serviceMocks.NewMockUserService(mc)
 				mock.EXPECT().Get(ctx, id).Return(expected, nil)
 				return mock
 			},
@@ -77,10 +77,10 @@ func TestGet(t *testing.T) {
 				id:  id,
 			},
 			expected: nil,
-			err:      repoErr,
-			userRepositoryMockFunc: func(mc *gomock.Controller) repository.UserRepository {
-				mock := repoMocks.NewMockUserRepository(mc)
-				mock.EXPECT().Get(ctx, id).Return(nil, repoErr)
+			err:      serviceErr,
+			userServiceMockFunc: func(mc *gomock.Controller) service.UserService {
+				mock := serviceMocks.NewMockUserService(mc)
+				mock.EXPECT().Get(ctx, id).Return(nil, serviceErr)
 				return mock
 			},
 		},
@@ -90,8 +90,8 @@ func TestGet(t *testing.T) {
 		test := test
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
-			userRepositoryMock := test.userRepositoryMockFunc(mc)
-			result, err := userRepositoryMock.Get(test.input.ctx, test.input.id)
+			userServiceMock := test.userServiceMockFunc(mc)
+			result, err := userServiceMock.Get(test.input.ctx, test.input.id)
 
 			//	Assert
 			require.Equal(t, test.err, err)
