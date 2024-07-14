@@ -10,12 +10,34 @@ import (
 
 func (s *serv) Update(ctx context.Context, dto user.UpdateDTO) (user.User, error) {
 	// check user exists
-	if _, err := s.userRepository.GetByID(ctx, dto.ID); err != nil {
+	u, err := s.userRepository.GetByID(ctx, dto.ID)
+	if err != nil {
 		return user.User{}, err
 	}
 
-	// TODO: check exist user new data here...
+	// check exists if new username
+	if u.Username != dto.Username {
+		ie, err := s.userRepository.ExistsUsername(ctx, dto.Username)
+		if err != nil {
+			return user.User{}, err
+		}
+		if ie {
+			return user.User{}, apperrors.ErrUsernameAlreadyExists
+		}
+	}
 
+	// check exists if new email
+	if u.Email != dto.Email {
+		ie, err := s.userRepository.ExistsEmail(ctx, dto.Email)
+		if err != nil {
+			return user.User{}, err
+		}
+		if ie {
+			return user.User{}, apperrors.ErrEmailAlreadyExists
+		}
+	}
+
+	// if password is change to generate hash password
 	if !bcrypt.IsBcryptHash(dto.Password) {
 		// generate password hash
 		hp, err := bcrypt.GenerateHash(dto.Password)

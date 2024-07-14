@@ -8,12 +8,12 @@ import (
 	"github.com/go-jedi/auth/internal/domain/user"
 )
 
-func (i *Implementation) SignUp(ctx context.Context, req *protoservice.SignUpRequest) (*protomodel.User, error) {
+func (i *Implementation) SignUp(ctx context.Context, in *protoservice.SignUpRequest) (*protomodel.User, error) {
 	dto := user.CreateDTO{
-		Username: req.GetUsername(),
-		FullName: req.GetFullName(),
-		Email:    req.GetEmail(),
-		Password: req.GetPassword(),
+		Username: in.GetUsername(),
+		FullName: in.GetFullName(),
+		Email:    in.GetEmail(),
+		Password: in.GetPassword(),
 	}
 
 	// check valid dto

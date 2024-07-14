@@ -7,10 +7,10 @@ import (
 	"github.com/go-jedi/auth/internal/domain/auth"
 )
 
-func (i *Implementation) Refresh(ctx context.Context, req *protoservice.RefreshRequest) (*protoservice.RefreshResponse, error) {
+func (i *Implementation) Refresh(ctx context.Context, in *protoservice.RefreshRequest) (*protoservice.RefreshResponse, error) {
 	dto := auth.RefreshDTO{
-		ID:           req.GetId(),
-		RefreshToken: req.GetRefreshToken(),
+		ID:           in.GetId(),
+		RefreshToken: in.GetRefreshToken(),
 	}
 
 	// check valid dto

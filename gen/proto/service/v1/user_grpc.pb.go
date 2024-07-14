@@ -21,13 +21,15 @@ import (
 const _ = grpc.SupportPackageIsVersion8
 
 const (
-	UserV1_Create_FullMethodName        = "/proto.service.v1.UserV1/Create"
-	UserV1_All_FullMethodName           = "/proto.service.v1.UserV1/All"
-	UserV1_GetByID_FullMethodName       = "/proto.service.v1.UserV1/GetByID"
-	UserV1_GetByUsername_FullMethodName = "/proto.service.v1.UserV1/GetByUsername"
-	UserV1_Exists_FullMethodName        = "/proto.service.v1.UserV1/Exists"
-	UserV1_Update_FullMethodName        = "/proto.service.v1.UserV1/Update"
-	UserV1_Delete_FullMethodName        = "/proto.service.v1.UserV1/Delete"
+	UserV1_Create_FullMethodName         = "/proto.service.v1.UserV1/Create"
+	UserV1_All_FullMethodName            = "/proto.service.v1.UserV1/All"
+	UserV1_GetByID_FullMethodName        = "/proto.service.v1.UserV1/GetByID"
+	UserV1_GetByUsername_FullMethodName  = "/proto.service.v1.UserV1/GetByUsername"
+	UserV1_Exists_FullMethodName         = "/proto.service.v1.UserV1/Exists"
+	UserV1_ExistsUsername_FullMethodName = "/proto.service.v1.UserV1/ExistsUsername"
+	UserV1_ExistsEmail_FullMethodName    = "/proto.service.v1.UserV1/ExistsEmail"
+	UserV1_Update_FullMethodName         = "/proto.service.v1.UserV1/Update"
+	UserV1_Delete_FullMethodName         = "/proto.service.v1.UserV1/Delete"
 )
 
 // UserV1Client is the client API for UserV1 service.
@@ -39,6 +41,8 @@ type UserV1Client interface {
 	GetByID(ctx context.Context, in *GetByIDRequest, opts ...grpc.CallOption) (*v1.User, error)
 	GetByUsername(ctx context.Context, in *GetByUsernameRequest, opts ...grpc.CallOption) (*v1.User, error)
 	Exists(ctx context.Context, in *ExistsRequest, opts ...grpc.CallOption) (*ExistsResponse, error)
+	ExistsUsername(ctx context.Context, in *ExistsUsernameRequest, opts ...grpc.CallOption) (*ExistsUsernameResponse, error)
+	ExistsEmail(ctx context.Context, in *ExistsEmailRequest, opts ...grpc.CallOption) (*ExistsEmailResponse, error)
 	Update(ctx context.Context, in *UpdateRequest, opts ...grpc.CallOption) (*v1.User, error)
 	Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
@@ -101,6 +105,26 @@ func (c *userV1Client) Exists(ctx context.Context, in *ExistsRequest, opts ...gr
 	return out, nil
 }
 
+func (c *userV1Client) ExistsUsername(ctx context.Context, in *ExistsUsernameRequest, opts ...grpc.CallOption) (*ExistsUsernameResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ExistsUsernameResponse)
+	err := c.cc.Invoke(ctx, UserV1_ExistsUsername_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userV1Client) ExistsEmail(ctx context.Context, in *ExistsEmailRequest, opts ...grpc.CallOption) (*ExistsEmailResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ExistsEmailResponse)
+	err := c.cc.Invoke(ctx, UserV1_ExistsEmail_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *userV1Client) Update(ctx context.Context, in *UpdateRequest, opts ...grpc.CallOption) (*v1.User, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(v1.User)
@@ -130,6 +154,8 @@ type UserV1Server interface {
 	GetByID(context.Context, *GetByIDRequest) (*v1.User, error)
 	GetByUsername(context.Context, *GetByUsernameRequest) (*v1.User, error)
 	Exists(context.Context, *ExistsRequest) (*ExistsResponse, error)
+	ExistsUsername(context.Context, *ExistsUsernameRequest) (*ExistsUsernameResponse, error)
+	ExistsEmail(context.Context, *ExistsEmailRequest) (*ExistsEmailResponse, error)
 	Update(context.Context, *UpdateRequest) (*v1.User, error)
 	Delete(context.Context, *DeleteRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedUserV1Server()
@@ -153,6 +179,12 @@ func (UnimplementedUserV1Server) GetByUsername(context.Context, *GetByUsernameRe
 }
 func (UnimplementedUserV1Server) Exists(context.Context, *ExistsRequest) (*ExistsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Exists not implemented")
+}
+func (UnimplementedUserV1Server) ExistsUsername(context.Context, *ExistsUsernameRequest) (*ExistsUsernameResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ExistsUsername not implemented")
+}
+func (UnimplementedUserV1Server) ExistsEmail(context.Context, *ExistsEmailRequest) (*ExistsEmailResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ExistsEmail not implemented")
 }
 func (UnimplementedUserV1Server) Update(context.Context, *UpdateRequest) (*v1.User, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
@@ -263,6 +295,42 @@ func _UserV1_Exists_Handler(srv interface{}, ctx context.Context, dec func(inter
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserV1_ExistsUsername_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ExistsUsernameRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserV1Server).ExistsUsername(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserV1_ExistsUsername_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserV1Server).ExistsUsername(ctx, req.(*ExistsUsernameRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserV1_ExistsEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ExistsEmailRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserV1Server).ExistsEmail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserV1_ExistsEmail_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserV1Server).ExistsEmail(ctx, req.(*ExistsEmailRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _UserV1_Update_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateRequest)
 	if err := dec(in); err != nil {
@@ -325,6 +393,14 @@ var UserV1_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Exists",
 			Handler:    _UserV1_Exists_Handler,
+		},
+		{
+			MethodName: "ExistsUsername",
+			Handler:    _UserV1_ExistsUsername_Handler,
+		},
+		{
+			MethodName: "ExistsEmail",
+			Handler:    _UserV1_ExistsEmail_Handler,
 		},
 		{
 			MethodName: "Update",

@@ -12,6 +12,8 @@ type UserRepository interface {
 	GetByID(ctx context.Context, id int64) (user.User, error)
 	GetByUsername(ctx context.Context, username string) (user.User, error)
 	Exists(ctx context.Context, username string, email string) (bool, error)
+	ExistsUsername(ctx context.Context, username string) (bool, error)
+	ExistsEmail(ctx context.Context, email string) (bool, error)
 	Update(ctx context.Context, dto user.UpdateDTO) (user.User, error)
 	Delete(ctx context.Context, id int64) error
 }

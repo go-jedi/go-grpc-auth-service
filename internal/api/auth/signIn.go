@@ -7,10 +7,10 @@ import (
 	"github.com/go-jedi/auth/internal/domain/auth"
 )
 
-func (i *Implementation) SignIn(ctx context.Context, req *protoservice.SignInRequest) (*protoservice.SignInResponse, error) {
+func (i *Implementation) SignIn(ctx context.Context, in *protoservice.SignInRequest) (*protoservice.SignInResponse, error) {
 	dto := auth.SignInDTO{
-		Username: req.GetUsername(),
-		Password: req.GetPassword(),
+		Username: in.GetUsername(),
+		Password: in.GetPassword(),
 	}
 
 	// check valid dto

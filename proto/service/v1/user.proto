@@ -13,6 +13,8 @@ service UserV1 {
   rpc GetByID(GetByIDRequest) returns (model.v1.User);
   rpc GetByUsername(GetByUsernameRequest) returns (model.v1.User);
   rpc Exists(ExistsRequest) returns (ExistsResponse);
+  rpc ExistsUsername(ExistsUsernameRequest) returns (ExistsUsernameResponse);
+  rpc ExistsEmail(ExistsEmailRequest) returns (ExistsEmailResponse);
   rpc Update(UpdateRequest) returns (model.v1.User);
   rpc Delete(DeleteRequest) returns(google.protobuf.Empty);
 }
@@ -53,7 +55,7 @@ message GetByUsernameRequest {
 }
 
 //
-// EXISTS
+// EXISTS USERNAME OR EMAIL
 //
 
 message ExistsRequest {
@@ -62,6 +64,30 @@ message ExistsRequest {
 }
 
 message ExistsResponse {
+  bool exists = 1;
+}
+
+//
+// EXISTS USERNAME
+//
+
+message ExistsUsernameRequest {
+  string username = 1;
+}
+
+message ExistsUsernameResponse {
+  bool exists = 1;
+}
+
+//
+// EXISTS EMAIL
+//
+
+message ExistsEmailRequest {
+  string email = 1;
+}
+
+message ExistsEmailResponse {
   bool exists = 1;
 }
 

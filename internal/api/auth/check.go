@@ -7,10 +7,10 @@ import (
 	"github.com/go-jedi/auth/internal/domain/auth"
 )
 
-func (i *Implementation) Check(ctx context.Context, req *protoservice.CheckRequest) (*protoservice.CheckResponse, error) {
+func (i *Implementation) Check(ctx context.Context, in *protoservice.CheckRequest) (*protoservice.CheckResponse, error) {
 	dto := auth.CheckDTO{
-		ID:    req.GetId(),
-		Token: req.GetToken(),
+		ID:    in.GetId(),
+		Token: in.GetToken(),
 	}
 
 	// check valid dto

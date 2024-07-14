@@ -8,13 +8,13 @@ import (
 	"github.com/go-jedi/auth/internal/domain/user"
 )
 
-func (i *Implementation) Update(ctx context.Context, req *protoservice.UpdateRequest) (*protomodel.User, error) {
+func (i *Implementation) Update(ctx context.Context, in *protoservice.UpdateRequest) (*protomodel.User, error) {
 	dto := user.UpdateDTO{
-		ID:       req.GetId(),
-		Username: req.GetUsername(),
-		FullName: req.GetFullName(),
-		Email:    req.GetEmail(),
-		Password: req.GetPassword(),
+		ID:       in.GetId(),
+		Username: in.GetUsername(),
+		FullName: in.GetFullName(),
+		Email:    in.GetEmail(),
+		Password: in.GetPassword(),
 	}
 
 	u, err := i.userService.Update(ctx, dto)
