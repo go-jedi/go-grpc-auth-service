@@ -1,0 +1,74 @@
+syntax = "proto3";
+
+package proto.service.v1;
+
+option go_package = "github.com/go-jedi/auth/gen/proto/service/v1;proto_service";
+
+import "google/protobuf/timestamp.proto";
+import "proto/model/v1/user.proto";
+
+service AuthV1 {
+  rpc SignUp(SignUpRequest) returns (model.v1.User);
+  rpc SignIn(SignInRequest) returns (SignInResponse);
+  rpc Check(CheckRequest) returns (CheckResponse);
+  rpc Refresh(RefreshRequest) returns (RefreshResponse);
+}
+
+//
+// SIGN UP
+//
+
+message SignUpRequest {
+  string username = 1;
+  string full_name = 2;
+  string email = 3;
+  string password = 4;
+}
+
+//
+// SIGN IN
+//
+
+message SignInRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message SignInResponse {
+  string access_token = 1;
+  string refresh_token = 2;
+  google.protobuf.Timestamp access_exp_at = 3;
+  google.protobuf.Timestamp refresh_exp_at = 4;
+}
+
+//
+// CHECK TOKEN
+//
+
+message CheckRequest {
+  int64 id = 1;
+  string token = 2;
+}
+
+message CheckResponse {
+  int64 id = 1;
+  string username = 2;
+  string token = 3;
+  google.protobuf.Timestamp exp_at = 4;
+}
+
+//
+// REFRESH TOKEN
+//
+
+message RefreshRequest {
+  int64 id = 1;
+  string token = 2;
+}
+
+message RefreshResponse {
+  string access_token = 1;
+  string refresh_token = 2;
+  google.protobuf.Timestamp access_exp_at = 3;
+  google.protobuf.Timestamp refresh_exp_at = 4;
+}

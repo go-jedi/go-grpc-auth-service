@@ -1,0 +1,86 @@
+syntax = "proto3";
+
+package proto.service.v1;
+
+option go_package = "github.com/go-jedi/auth/gen/proto/service/v1;proto_service";
+
+import "google/protobuf/empty.proto";
+import "proto/model/v1/user.proto";
+
+service UserV1 {
+  rpc Create(CreateRequest) returns (model.v1.User);
+  rpc All(google.protobuf.Empty) returns (AllResponse);
+  rpc GetByID(GetByIDRequest) returns (model.v1.User);
+  rpc GetByUsername(GetByUsernameRequest) returns (model.v1.User);
+  rpc Exists(ExistsRequest) returns (ExistsResponse);
+  rpc Update(UpdateRequest) returns (model.v1.User);
+  rpc Delete(DeleteRequest) returns(google.protobuf.Empty);
+}
+
+//
+// CREATE
+//
+
+message CreateRequest {
+  string username = 1;
+  string full_name = 2;
+  string email = 3;
+  string password = 4;
+}
+
+//
+// ALL
+//
+
+message AllResponse {
+  repeated model.v1.User users = 1;
+}
+
+//
+// GET BY ID
+//
+
+message GetByIDRequest {
+  int64 id = 1;
+}
+
+//
+// GET BY USERNAME
+//
+
+message GetByUsernameRequest {
+  string username = 1;
+}
+
+//
+// EXISTS
+//
+
+message ExistsRequest {
+  string username = 1;
+  string email = 2;
+}
+
+message ExistsResponse {
+  bool exists = 1;
+}
+
+//
+// UPDATE
+//
+
+message UpdateRequest {
+  int64 id = 1;
+  string username = 2;
+  string full_name = 3;
+  string email = 4;
+  string password = 5;
+}
+
+//
+// DELETE
+//
+
+message DeleteRequest {
+  int64 id = 1;
+}

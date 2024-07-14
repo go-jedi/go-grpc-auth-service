@@ -1,0 +1,22 @@
+volumes:
+  postgres_volume:
+
+services:
+  #  app:
+  #    build: .
+  #    depends_on:
+  #      - postgres
+  #    restart: always
+  #    ports:
+  #      - '50053:50053'
+
+  postgres:
+    image: postgres:latest
+    environment:
+      - "POSTGRES_DB=auth_db"
+      - "POSTGRES_USER=auth"
+      - "POSTGRES_PASSWORD=auth"
+    ports:
+      - "54321:5432"
+    volumes:
+      - postgres_volume:/var/lib/postgresql/data
