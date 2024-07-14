@@ -21,10 +21,15 @@ func (s *serv) SignIn(ctx context.Context, dto auth.SignInDTO) (auth.SignInResp,
 	}
 
 	// generate access, refresh tokens
-	t, err := s.jwt.Generate(u.ID, u.Username)
+	gr, err := s.jwt.Generate(u.ID, u.Username)
 	if err != nil {
 		return auth.SignInResp{}, err
 	}
 
-	return t, nil
+	return auth.SignInResp{
+		AccessToken:  gr.AccessToken,
+		RefreshToken: gr.RefreshToken,
+		AccessExpAt:  gr.AccessExpAt,
+		RefreshExpAt: gr.RefreshExpAt,
+	}, nil
 }

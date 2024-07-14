@@ -62,8 +62,8 @@ func (cr *CheckResp) ToProto() *protoservice.CheckResponse {
 //
 
 type RefreshDTO struct {
-	ID    int64  `validate:"required,min=1"`
-	Token string `validate:"required"`
+	ID           int64  `validate:"required,min=1"`
+	RefreshToken string `validate:"required"`
 }
 
 type RefreshResp struct {
@@ -71,4 +71,13 @@ type RefreshResp struct {
 	RefreshToken string
 	AccessExpAt  time.Time
 	RefreshExpAt time.Time
+}
+
+func (rr *RefreshResp) ToProto() *protoservice.RefreshResponse {
+	return &protoservice.RefreshResponse{
+		AccessToken:  rr.AccessToken,
+		RefreshToken: rr.RefreshToken,
+		AccessExpAt:  timestamppb.New(rr.AccessExpAt),
+		RefreshExpAt: timestamppb.New(rr.RefreshExpAt),
+	}
 }

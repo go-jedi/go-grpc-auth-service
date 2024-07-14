@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/go-jedi/auth/config"
-	"github.com/go-jedi/auth/internal/domain/auth"
 	"github.com/go-jedi/auth/pkg/uid"
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -23,6 +22,7 @@ var (
 	ErrTokenClaims        = errors.New("unexpected token claims")
 	ErrTokenExpired       = errors.New("token has expired")
 	ErrTokenID            = errors.New("unexpected token id")
+	ErrTokenUsername      = errors.New("unexpected token username")
 )
 
 type tokenClaims struct {
@@ -72,22 +72,29 @@ func NewJWT(cfg config.JWTConfig) (*JWT, error) {
 	return j, nil
 }
 
+type GenerateResp struct {
+	AccessToken  string
+	RefreshToken string
+	AccessExpAt  time.Time
+	RefreshExpAt time.Time
+}
+
 // Generate token.
-func (j *JWT) Generate(id int64, username string) (auth.SignInResp, error) {
+func (j *JWT) Generate(id int64, username string) (GenerateResp, error) {
 	aExpAt := j.getAccessExpAt()
 	rExpAt := j.getRefreshExpAt()
 
 	aToken, err := j.createToken(id, username, aExpAt)
 	if err != nil {
-		return auth.SignInResp{}, err
+		return GenerateResp{}, err
 	}
 
 	rToken, err := j.createToken(id, username, rExpAt)
 	if err != nil {
-		return auth.SignInResp{}, err
+		return GenerateResp{}, err
 	}
 
-	return auth.SignInResp{
+	return GenerateResp{
 		AccessToken:  aToken,
 		RefreshToken: rToken,
 		AccessExpAt:  aExpAt,
@@ -95,8 +102,14 @@ func (j *JWT) Generate(id int64, username string) (auth.SignInResp, error) {
 	}, nil
 }
 
+type VerifyResp struct {
+	ID       int64
+	Username string
+	ExpAt    time.Time
+}
+
 // Verify token.
-func (j *JWT) Verify(id int64, token string) (int64, string, time.Time, error) {
+func (j *JWT) Verify(id int64, username string, token string) (VerifyResp, error) {
 	// parse the token
 	t, err := jwt.ParseWithClaims(
 		token,
@@ -108,31 +121,40 @@ func (j *JWT) Verify(id int64, token string) (int64, string, time.Time, error) {
 			return j.secret, nil
 		})
 	if err != nil {
-		return 0, "", time.Time{}, err
+		return VerifyResp{}, err
 	}
 
 	// check token valid
 	if !t.Valid {
-		return 0, "", time.Time{}, ErrTokenInvalid
+		return VerifyResp{}, ErrTokenInvalid
 	}
 
 	// extract the claims
 	c, ok := t.Claims.(*tokenClaims)
 	if !ok {
-		return 0, "", time.Time{}, ErrTokenClaims
+		return VerifyResp{}, ErrTokenClaims
 	}
 
 	// check expired token
 	if c.ExpiresAt != nil && time.Now().After(c.ExpiresAt.Time) {
-		return 0, "", time.Time{}, ErrTokenExpired
+		return VerifyResp{}, ErrTokenExpired
 	}
 
 	// compare id with id in token
 	if id != c.ID {
-		return 0, "", time.Time{}, ErrTokenID
+		return VerifyResp{}, ErrTokenID
 	}
 
-	return c.ID, c.Username, c.ExpiresAt.Time, nil
+	// compare username with username in token
+	if username != c.Username {
+		return VerifyResp{}, ErrTokenUsername
+	}
+
+	return VerifyResp{
+		ID:       c.ID,
+		Username: c.Username,
+		ExpAt:    c.ExpiresAt.Time,
+	}, nil
 }
 
 // createToken create token.
