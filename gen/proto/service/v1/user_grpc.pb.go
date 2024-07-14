@@ -4,7 +4,7 @@
 // - protoc             v3.21.12
 // source: proto/service/v1/user.proto
 
-package proto_service
+package protoservice
 
 import (
 	context "context"

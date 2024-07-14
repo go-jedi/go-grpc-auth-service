@@ -12,7 +12,7 @@ func (r *repo) GetByUsername(ctx context.Context, username string) (user.User, e
 	q := `
 		SELECT *
 		FROM users
-		WHERE username = $1
+		WHERE username = $1;
 	`
 
 	if err := r.db.Pool.QueryRow(ctx, q, username).Scan(

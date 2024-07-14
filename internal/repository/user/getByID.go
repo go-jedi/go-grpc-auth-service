@@ -12,7 +12,7 @@ func (r *repo) GetByID(ctx context.Context, id int64) (user.User, error) {
 	q := `
 		SELECT *
 		FROM users
-		WHERE id = $1
+		WHERE id = $1;
 	`
 
 	if err := r.db.Pool.QueryRow(ctx, q, id).Scan(

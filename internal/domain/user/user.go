@@ -32,6 +32,16 @@ func (u *User) ToProto() *protomodel.User {
 	}
 }
 
+func SliceToProto(in []User) []*protomodel.User {
+	out := make([]*protomodel.User, 0, len(in))
+
+	for _, u := range in {
+		out = append(out, u.ToProto())
+	}
+
+	return out
+}
+
 //
 // CREATE
 //

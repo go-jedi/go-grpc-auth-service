@@ -2,10 +2,25 @@ package user
 
 import (
 	"context"
-	"fmt"
+
+	"github.com/go-jedi/auth/pkg/apperrors"
 )
 
-func (r *repo) Delete(_ context.Context, id int64) error {
-	fmt.Println("id:", id)
+func (r *repo) Delete(ctx context.Context, id int64) error {
+	q := `
+		UPDATE users SET
+		    deleted = TRUE
+		WHERE id = $1;
+	`
+
+	ct, err := r.db.Pool.Exec(ctx, q, id)
+	if err != nil {
+		return err
+	}
+
+	if ct.RowsAffected() != 1 {
+		return apperrors.ErrNoRowsWereUpdate
+	}
+
 	return nil
 }

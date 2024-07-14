@@ -6,6 +6,13 @@ import (
 	protoservice "github.com/go-jedi/auth/gen/proto/service/v1"
 )
 
-func (i *Implementation) Exists(context.Context, *protoservice.ExistsRequest) (*protoservice.ExistsResponse, error) {
-	return &protoservice.ExistsResponse{}, nil
+func (i *Implementation) Exists(ctx context.Context, req *protoservice.ExistsRequest) (*protoservice.ExistsResponse, error) {
+	ie, err := i.userService.Exists(ctx, req.GetUsername(), req.GetEmail())
+	if err != nil {
+		return nil, err
+	}
+
+	return &protoservice.ExistsResponse{
+		Exists: ie,
+	}, nil
 }

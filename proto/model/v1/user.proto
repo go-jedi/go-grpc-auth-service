@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package proto.model.v1;
 
-option go_package = "github.com/go-jedi/auth/gen/proto/model/v1;proto_model";
+option go_package = "github.com/go-jedi/auth/gen/proto/model/v1;protomodel";
 
 import "google/protobuf/timestamp.proto";
 
