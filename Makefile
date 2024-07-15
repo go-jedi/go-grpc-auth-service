@@ -30,6 +30,15 @@ generate-proto:
 	-I . \
 	proto/model/v1/user.proto proto/service/v1/auth.proto proto/service/v1/user.proto
 
+mock-generate:
+	rm -rf internal/service/mocks
+	mockgen -source=internal/service/service.go \
+	-destination=internal/service/mocks/mock_service.go
+
+	rm -rf internal/repository/mocks
+	mockgen -source=internal/repository/repository.go \
+    	-destination=internal/repository/mocks/mock_repository.go
+
 test-coverage:
 	go test -short -count=1 -coverprofile=coverage.out ./...
 	go tool cover -html=coverage.out
