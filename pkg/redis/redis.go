@@ -10,7 +10,6 @@ import (
 
 const (
 	PrefixUser = "user:"
-	ExpAt      = 60 * time.Minute
 )
 
 type Redis struct {
