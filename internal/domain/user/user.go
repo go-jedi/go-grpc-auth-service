@@ -14,7 +14,6 @@ type User struct {
 	Email        string
 	Password     string
 	PasswordHash string
-	Deleted      bool
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 }
@@ -26,7 +25,6 @@ func (u *User) ToProto() *protomodel.User {
 		FullName:     u.FullName,
 		Email:        u.Email,
 		PasswordHash: u.PasswordHash,
-		Deleted:      u.Deleted,
 		CreatedAt:    timestamppb.New(u.CreatedAt),
 		UpdatedAt:    timestamppb.New(u.UpdatedAt),
 	}

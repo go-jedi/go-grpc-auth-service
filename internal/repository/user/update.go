@@ -21,7 +21,7 @@ func (r *repo) Update(ctx context.Context, dto user.UpdateDTO) (user.User, error
 
 	if err := r.db.Pool.QueryRow(ctx, q, dto.Username, dto.FullName, dto.Email, dto.Password, dto.ID).Scan(
 		&uu.ID, &uu.Username, &uu.FullName, &uu.Email,
-		&uu.PasswordHash, &uu.Deleted, &uu.CreatedAt, &uu.UpdatedAt,
+		&uu.PasswordHash, &uu.CreatedAt, &uu.UpdatedAt,
 	); err != nil {
 		return user.User{}, err
 	}

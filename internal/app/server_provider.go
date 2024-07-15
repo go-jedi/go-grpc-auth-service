@@ -13,6 +13,7 @@ import (
 	"github.com/go-jedi/auth/pkg/jwt"
 	"github.com/go-jedi/auth/pkg/logger"
 	"github.com/go-jedi/auth/pkg/postgres"
+	"github.com/go-jedi/auth/pkg/redis"
 	"github.com/go-jedi/auth/pkg/validator"
 )
 
@@ -21,6 +22,7 @@ type serviceProvider struct {
 	validator *validator.Validator
 	jwt       *jwt.JWT
 	db        *postgres.Postgres
+	cache     *redis.Redis
 
 	// auth
 	authService service.AuthService
@@ -37,12 +39,14 @@ func newServiceProvider(
 	validator *validator.Validator,
 	jwt *jwt.JWT,
 	db *postgres.Postgres,
+	cache *redis.Redis,
 ) *serviceProvider {
 	return &serviceProvider{
 		logger:    logger,
 		validator: validator,
 		jwt:       jwt,
 		db:        db,
+		cache:     cache,
 	}
 }
 
@@ -56,6 +60,7 @@ func (sp *serviceProvider) AuthService(ctx context.Context) service.AuthService 
 			sp.UserRepository(ctx),
 			sp.logger,
 			sp.jwt,
+			sp.cache,
 		)
 	}
 
@@ -94,6 +99,7 @@ func (sp *serviceProvider) UserService(ctx context.Context) service.UserService 
 		sp.userService = userService.NewService(
 			sp.UserRepository(ctx),
 			sp.logger,
+			sp.cache,
 		)
 	}
 

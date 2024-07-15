@@ -24,7 +24,7 @@ func (r *repo) All(ctx context.Context) ([]user.User, error) {
 
 		err := rows.Scan(
 			&u.ID, &u.Username, &u.FullName, &u.Email,
-			&u.PasswordHash, &u.Deleted, &u.CreatedAt, &u.UpdatedAt,
+			&u.PasswordHash, &u.CreatedAt, &u.UpdatedAt,
 		)
 		if err != nil {
 			return nil, err

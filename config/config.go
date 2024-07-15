@@ -36,6 +36,21 @@ type PostgresConfig struct {
 	MigrationsDir string `yaml:"migrations_dir"`
 }
 
+type RedisConfig struct {
+	Addr            string `yaml:"addr"`
+	Password        string `yaml:"password"`
+	DB              int    `yaml:"db"`
+	DialTimeout     int    `yaml:"dial_timeout"`
+	ReadTimeout     int    `yaml:"read_timeout"`
+	WriteTimeout    int    `yaml:"write_timeout"`
+	PoolSize        int    `yaml:"pool_size"`
+	MinIdleConns    int    `yaml:"min_idle_conns"`
+	PoolTimeout     int    `yaml:"pool_timeout"`
+	MaxRetries      int    `yaml:"max_retries"`
+	MinRetryBackoff int    `yaml:"min_retry_backoff"`
+	MaxRetryBackoff int    `yaml:"max_retry_backoff"`
+}
+
 type GRPCServerConfig struct {
 	Host string `yaml:"host"`
 	Port int    `yaml:"port"`
@@ -45,6 +60,7 @@ type Config struct {
 	Logger     LoggerConfig     `yaml:"logger"`
 	JWT        JWTConfig        `yaml:"jwt"`
 	Postgres   PostgresConfig   `yaml:"postgres"`
+	Redis      RedisConfig      `yaml:"redis"`
 	GRPCServer GRPCServerConfig `yaml:"grpcserver"`
 }
 

@@ -7,11 +7,7 @@ import (
 )
 
 func (r *repo) Delete(ctx context.Context, id int64) error {
-	q := `
-		UPDATE users SET
-		    deleted = TRUE
-		WHERE id = $1;
-	`
+	q := `DELETE FROM users WHERE id = $1;`
 
 	ct, err := r.db.Pool.Exec(ctx, q, id)
 	if err != nil {

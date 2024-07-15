@@ -2,6 +2,8 @@ package user
 
 import (
 	"context"
+	"log"
+	"strconv"
 
 	"github.com/go-jedi/auth/internal/domain/user"
 	"github.com/go-jedi/auth/pkg/apperrors"
@@ -47,5 +49,22 @@ func (s *serv) Update(ctx context.Context, dto user.UpdateDTO) (user.User, error
 		dto.Password = hp
 	}
 
-	return s.userRepository.Update(ctx, dto)
+	u, err = s.userRepository.Update(ctx, dto)
+	if err != nil {
+		return user.User{}, err
+	}
+
+	// update user in cache
+	if err := s.updateCache(ctx, u); err != nil {
+		log.Println(err)
+	}
+
+	return u, err
+}
+
+// updateCache update value in cache.
+func (s *serv) updateCache(ctx context.Context, u user.User) error {
+	key := strconv.FormatInt(u.ID, 10)
+
+	return s.cache.User.Set(ctx, key, u, 0)
 }

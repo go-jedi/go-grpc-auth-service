@@ -17,7 +17,7 @@ func (r *repo) GetByID(ctx context.Context, id int64) (user.User, error) {
 
 	if err := r.db.Pool.QueryRow(ctx, q, id).Scan(
 		&u.ID, &u.Username, &u.FullName, &u.Email,
-		&u.PasswordHash, &u.Deleted, &u.CreatedAt, &u.UpdatedAt,
+		&u.PasswordHash, &u.CreatedAt, &u.UpdatedAt,
 	); err != nil {
 		return user.User{}, err
 	}

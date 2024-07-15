@@ -9,6 +9,7 @@ import (
 	"github.com/go-jedi/auth/pkg/jwt"
 	"github.com/go-jedi/auth/pkg/logger"
 	"github.com/go-jedi/auth/pkg/postgres"
+	"github.com/go-jedi/auth/pkg/redis"
 	"github.com/go-jedi/auth/pkg/validator"
 )
 
@@ -20,6 +21,7 @@ type App struct {
 	jwt       *jwt.JWT
 	gs        *grpcserver.GRPCServer
 	db        *postgres.Postgres
+	cache     *redis.Redis
 	sp        *serviceProvider
 }
 
@@ -46,6 +48,7 @@ func (a *App) initDeps(ctx context.Context) error {
 		a.initValidator,
 		a.initJWT,
 		a.initPostgres,
+		a.initRedis,
 		a.initServiceProvider,
 		a.initGRPCServer,
 	}
@@ -101,9 +104,19 @@ func (a *App) initPostgres(ctx context.Context) (err error) {
 	return nil
 }
 
+// initRedis initialize redis.
+func (a *App) initRedis(ctx context.Context) (err error) {
+	a.cache, err = redis.NewRedis(ctx, a.cfg.Redis)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // initServiceProvider initialize server provider.
 func (a *App) initServiceProvider(_ context.Context) error {
-	a.sp = newServiceProvider(a.logger, a.validator, a.jwt, a.db)
+	a.sp = newServiceProvider(a.logger, a.validator, a.jwt, a.db, a.cache)
 	return nil
 }
 

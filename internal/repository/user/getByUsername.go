@@ -17,7 +17,7 @@ func (r *repo) GetByUsername(ctx context.Context, username string) (user.User, e
 
 	if err := r.db.Pool.QueryRow(ctx, q, username).Scan(
 		&u.ID, &u.Username, &u.FullName, &u.Email,
-		&u.PasswordHash, &u.Deleted, &u.CreatedAt, &u.UpdatedAt,
+		&u.PasswordHash, &u.CreatedAt, &u.UpdatedAt,
 	); err != nil {
 		return user.User{}, err
 	}
