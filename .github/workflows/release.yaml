@@ -66,12 +66,12 @@ jobs:
           cp main release/
           cp docker-compose.yaml release/
           cp config.yaml release/
-          zip -r ${{github.repository}}_${{ github.ref_name }}.zip release
+          zip -r grpc_auth_service.zip release
       - name: Release with Notes
         uses: softprops/action-gh-release@v2
         with:
           body_path: ".github/RELEASE-TEMPLATE.md"
           draft: false
-          files: ${{github.repository}}_${{ github.ref_name }}.zip
+          files: grpc_auth_service.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
