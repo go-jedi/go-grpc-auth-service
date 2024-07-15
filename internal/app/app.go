@@ -106,7 +106,7 @@ func (a *App) initPostgres(ctx context.Context) (err error) {
 
 // initRedis initialize redis.
 func (a *App) initRedis(ctx context.Context) (err error) {
-	a.cache, err = redis.NewRedis(ctx, a.cfg.Redis)
+	a.cache, err = redis.NewRedis(ctx, a.cfg.Redis, a.db)
 	if err != nil {
 		return err
 	}

@@ -49,6 +49,7 @@ type RedisConfig struct {
 	MaxRetries      int    `yaml:"max_retries"`
 	MinRetryBackoff int    `yaml:"min_retry_backoff"`
 	MaxRetryBackoff int    `yaml:"max_retry_backoff"`
+	DurCacheUpdate  int    `yaml:"dur_cache_update"`
 }
 
 type GRPCServerConfig struct {
