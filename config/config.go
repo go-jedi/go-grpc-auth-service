@@ -52,6 +52,11 @@ type RedisConfig struct {
 	DurCacheUpdate  int    `yaml:"dur_cache_update"`
 }
 
+type HTTPServerConfig struct {
+	Host string `yaml:"host"`
+	Port int    `yaml:"port"`
+}
+
 type GRPCServerConfig struct {
 	Host string `yaml:"host"`
 	Port int    `yaml:"port"`
@@ -62,6 +67,7 @@ type Config struct {
 	JWT        JWTConfig        `yaml:"jwt"`
 	Postgres   PostgresConfig   `yaml:"postgres"`
 	Redis      RedisConfig      `yaml:"redis"`
+	HTTPServer HTTPServerConfig `yaml:"httpserver"`
 	GRPCServer GRPCServerConfig `yaml:"grpcserver"`
 }
 

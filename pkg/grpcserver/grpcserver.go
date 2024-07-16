@@ -2,6 +2,7 @@ package grpcserver
 
 import (
 	"fmt"
+	"log"
 	"net"
 
 	"github.com/go-jedi/auth/config"
@@ -58,6 +59,8 @@ func (gs *GRPCServer) Start() error {
 	if err != nil {
 		return err
 	}
+
+	log.Printf("gRPC server listening at: %d", gs.port)
 
 	return gs.Server.Serve(l)
 }

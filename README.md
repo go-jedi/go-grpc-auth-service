@@ -53,3 +53,16 @@ grpcserver:
   host: 127.0.0.1
   port: 50053
 ```
+
+### start project:
+
+```yaml
+local:
+  1) make install-deps
+  2) make install-golangci-lint
+  3) make get-deps
+  4) make vendor-proto
+  5) make generate-proto
+  6) docker compose up -d
+  7) go run cmd/app/main.go --config testdata/config.yaml
+```

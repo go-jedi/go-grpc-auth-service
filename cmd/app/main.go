@@ -17,7 +17,7 @@ func main() {
 	}
 
 	// run application
-	if err := a.Run(); err != nil {
+	if err := a.Run(ctx); err != nil {
 		log.Fatalf("failed to run app: %v", err)
 	}
 }

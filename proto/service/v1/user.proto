@@ -5,18 +5,69 @@ package proto.service.v1;
 option go_package = "github.com/go-jedi/auth/gen/proto/service/v1;protoservice";
 
 import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
 import "proto/model/v1/user.proto";
 
 service UserV1 {
-  rpc Create(CreateRequest) returns (model.v1.User);
-  rpc All(google.protobuf.Empty) returns (AllResponse);
-  rpc GetByID(GetByIDRequest) returns (model.v1.User);
-  rpc GetByUsername(GetByUsernameRequest) returns (model.v1.User);
-  rpc Exists(ExistsRequest) returns (ExistsResponse);
-  rpc ExistsUsername(ExistsUsernameRequest) returns (ExistsUsernameResponse);
-  rpc ExistsEmail(ExistsEmailRequest) returns (ExistsEmailResponse);
-  rpc Update(UpdateRequest) returns (model.v1.User);
-  rpc Delete(DeleteRequest) returns(google.protobuf.Empty);
+  rpc Create(CreateRequest) returns (model.v1.User) {
+    option (google.api.http) = {
+      post: "/v1/user"
+      body: "*"
+    };
+  }
+
+  rpc All(google.protobuf.Empty) returns (AllResponse) {
+    option (google.api.http) = {
+      get: "/v1/user"
+    };
+  }
+
+  rpc GetByID(GetByIDRequest) returns (model.v1.User) {
+    option (google.api.http) = {
+      post: "/v1/user/id"
+      body: "*"
+    };
+  }
+
+  rpc GetByUsername(GetByUsernameRequest) returns (model.v1.User) {
+    option (google.api.http) = {
+      post: "/v1/user/username"
+      body: "*"
+    };
+  }
+
+  rpc Exists(ExistsRequest) returns (ExistsResponse) {
+    option (google.api.http) = {
+      post: "/v1/user/ex"
+      body: "*"
+    };
+  }
+
+  rpc ExistsUsername(ExistsUsernameRequest) returns (ExistsUsernameResponse) {
+    option (google.api.http) = {
+      post: "/v1/user/ex/username"
+      body: "*"
+    };
+  }
+
+  rpc ExistsEmail(ExistsEmailRequest) returns (ExistsEmailResponse) {
+    option (google.api.http) = {
+      post: "/v1/user/ex/email"
+      body: "*"
+    };
+  }
+
+  rpc Update(UpdateRequest) returns (model.v1.User) {
+    option (google.api.http) = {
+      patch: "/v1/user"
+      body: "*"
+    };
+  }
+  rpc Delete(DeleteRequest) returns(google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/user/{id}"
+    };
+  }
 }
 
 //

@@ -2,10 +2,12 @@ package app
 
 import (
 	"context"
+	"log"
 
 	"github.com/go-jedi/auth/config"
 	protoservice "github.com/go-jedi/auth/gen/proto/service/v1"
 	"github.com/go-jedi/auth/pkg/grpcserver"
+	"github.com/go-jedi/auth/pkg/httpserver"
 	"github.com/go-jedi/auth/pkg/jwt"
 	"github.com/go-jedi/auth/pkg/logger"
 	"github.com/go-jedi/auth/pkg/postgres"
@@ -20,6 +22,7 @@ type App struct {
 	validator *validator.Validator
 	jwt       *jwt.JWT
 	gs        *grpcserver.GRPCServer
+	hs        *httpserver.HTTPServer
 	db        *postgres.Postgres
 	cache     *redis.Redis
 	sp        *serviceProvider
@@ -36,8 +39,16 @@ func NewApp(ctx context.Context) (*App, error) {
 }
 
 // Run application.
-func (a *App) Run() error {
-	return a.runGRPCServer()
+func (a *App) Run(ctx context.Context) error {
+	// run grpc server in goroutine
+	go func() {
+		if err := a.runGRPCServer(); err != nil {
+			log.Println(err)
+		}
+	}()
+
+	// run http server
+	return a.runHTTPServer(ctx)
 }
 
 // initDeps initialize deps.
@@ -51,6 +62,7 @@ func (a *App) initDeps(ctx context.Context) error {
 		a.initRedis,
 		a.initServiceProvider,
 		a.initGRPCServer,
+		a.initHTTPServer,
 	}
 
 	for _, f := range i {
@@ -133,7 +145,22 @@ func (a *App) initGRPCServer(ctx context.Context) (err error) {
 	return nil
 }
 
-// runGRPCServer run server.
+// initHTTPServer initialize http server.
+func (a *App) initHTTPServer(_ context.Context) (err error) {
+	a.hs, err = httpserver.NewHTTPServer(a.cfg.HTTPServer)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// runGRPCServer run grpc server.
 func (a *App) runGRPCServer() error {
 	return a.gs.Start()
+}
+
+// runHTTPServer run http server.
+func (a *App) runHTTPServer(ctx context.Context) error {
+	return a.hs.Start(ctx, a.cfg.GRPCServer.Port)
 }

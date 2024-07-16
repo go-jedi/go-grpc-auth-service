@@ -39,6 +39,10 @@ redis:
   max_retry_backoff: 512 # millisecond
   dur_cache_update: 60 # minutes
 
+httpserver:
+  host: 127.0.0.1
+  port: 50052
+
 grpcserver:
   host: 127.0.0.1
   port: 50053
