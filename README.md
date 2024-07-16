@@ -54,6 +54,17 @@ grpcserver:
   port: 50053
 ```
 
+### .env example:
+```yaml
+POSTGRES_DB=auth_db
+POSTGRES_USER=auth
+POSTGRES_PASSWORD=auth
+
+REDIS_PASSWORD=auth
+REDIS_PORT=63790
+REDIS_DATABASES=0
+```
+
 ### start project:
 
 ```yaml

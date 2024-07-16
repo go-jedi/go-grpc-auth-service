@@ -7,19 +7,19 @@ import (
 	"github.com/go-jedi/auth/pkg/validator"
 )
 
-type Implementation struct {
+type Handler struct {
 	protoservice.UnimplementedAuthV1Server
 	authService service.AuthService
 	logger      *logger.Logger
 	validator   *validator.Validator
 }
 
-func NewImplementation(
+func NewHandler(
 	authService service.AuthService,
 	logger *logger.Logger,
 	validator *validator.Validator,
-) *Implementation {
-	return &Implementation{
+) *Handler {
+	return &Handler{
 		authService: authService,
 		logger:      logger,
 		validator:   validator,

@@ -9,18 +9,18 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (i *Implementation) Check(ctx context.Context, in *protoservice.CheckRequest) (*protoservice.CheckResponse, error) {
-	dto := auth.CheckDTO{
-		ID:    in.GetId(),
-		Token: in.GetToken(),
+func (h *Handler) SignIn(ctx context.Context, in *protoservice.SignInRequest) (*protoservice.SignInResponse, error) {
+	dto := auth.SignInDTO{
+		Username: in.GetUsername(),
+		Password: in.GetPassword(),
 	}
 
 	// check valid dto
-	if err := i.validator.Struct(dto); err != nil {
+	if err := h.validator.Struct(dto); err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	r, err := i.authService.Check(ctx, dto)
+	r, err := h.authService.SignIn(ctx, dto)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}

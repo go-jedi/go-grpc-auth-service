@@ -9,8 +9,8 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (i *Implementation) GetByID(ctx context.Context, in *protoservice.GetByIDRequest) (*protomodel.User, error) {
-	u, err := i.userService.GetByID(ctx, in.GetId())
+func (h *Handler) GetByID(ctx context.Context, in *protoservice.GetByIDRequest) (*protomodel.User, error) {
+	u, err := h.userService.GetByID(ctx, in.GetId())
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}

@@ -139,8 +139,8 @@ func (a *App) initGRPCServer(ctx context.Context) (err error) {
 		return err
 	}
 
-	protoservice.RegisterAuthV1Server(a.gs.Server, a.sp.AuthImpl(ctx))
-	protoservice.RegisterUserV1Server(a.gs.Server, a.sp.UserImpl(ctx))
+	protoservice.RegisterAuthV1Server(a.gs.Server, a.sp.AuthHandler(ctx))
+	protoservice.RegisterUserV1Server(a.gs.Server, a.sp.UserHandler(ctx))
 
 	return nil
 }

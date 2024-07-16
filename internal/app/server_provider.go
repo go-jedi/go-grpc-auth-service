@@ -3,8 +3,8 @@ package app
 import (
 	"context"
 
-	"github.com/go-jedi/auth/internal/api/auth"
-	"github.com/go-jedi/auth/internal/api/user"
+	"github.com/go-jedi/auth/internal/adapters/grpc/handlers/auth"
+	"github.com/go-jedi/auth/internal/adapters/grpc/handlers/user"
 	"github.com/go-jedi/auth/internal/repository"
 	userRepository "github.com/go-jedi/auth/internal/repository/user"
 	"github.com/go-jedi/auth/internal/service"
@@ -26,12 +26,12 @@ type serviceProvider struct {
 
 	// auth
 	authService service.AuthService
-	authImpl    *auth.Implementation
+	authImpl    *auth.Handler
 
 	// user
 	userRepository repository.UserRepository
 	userService    service.UserService
-	userImpl       *user.Implementation
+	userImpl       *user.Handler
 }
 
 func newServiceProvider(
@@ -67,9 +67,9 @@ func (sp *serviceProvider) AuthService(ctx context.Context) service.AuthService 
 	return sp.authService
 }
 
-func (sp *serviceProvider) AuthImpl(ctx context.Context) *auth.Implementation {
+func (sp *serviceProvider) AuthHandler(ctx context.Context) *auth.Handler {
 	if sp.authImpl == nil {
-		sp.authImpl = auth.NewImplementation(
+		sp.authImpl = auth.NewHandler(
 			sp.AuthService(ctx),
 			sp.logger,
 			sp.validator,
@@ -106,9 +106,9 @@ func (sp *serviceProvider) UserService(ctx context.Context) service.UserService 
 	return sp.userService
 }
 
-func (sp *serviceProvider) UserImpl(ctx context.Context) *user.Implementation {
+func (sp *serviceProvider) UserHandler(ctx context.Context) *user.Handler {
 	if sp.userImpl == nil {
-		sp.userImpl = user.NewImplementation(
+		sp.userImpl = user.NewHandler(
 			sp.UserService(ctx),
 			sp.logger,
 			sp.validator,

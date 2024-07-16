@@ -1,4 +1,4 @@
-package user
+package auth
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (i *Implementation) Create(ctx context.Context, in *protoservice.CreateRequest) (*protomodel.User, error) {
+func (h *Handler) SignUp(ctx context.Context, in *protoservice.SignUpRequest) (*protomodel.User, error) {
 	dto := user.CreateDTO{
 		Username: in.GetUsername(),
 		FullName: in.GetFullName(),
@@ -19,11 +19,11 @@ func (i *Implementation) Create(ctx context.Context, in *protoservice.CreateRequ
 	}
 
 	// check valid dto
-	if err := i.validator.Struct(dto); err != nil {
+	if err := h.validator.Struct(dto); err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	u, err := i.userService.Create(ctx, dto)
+	u, err := h.authService.SignUp(ctx, dto)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}

@@ -10,8 +10,8 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-func (i *Implementation) All(ctx context.Context, _ *emptypb.Empty) (*protoservice.AllResponse, error) {
-	u, err := i.userService.All(ctx)
+func (h *Handler) All(ctx context.Context, _ *emptypb.Empty) (*protoservice.AllResponse, error) {
+	u, err := h.userService.All(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}

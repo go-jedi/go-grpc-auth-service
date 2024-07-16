@@ -9,8 +9,8 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (i *Implementation) GetByUsername(ctx context.Context, in *protoservice.GetByUsernameRequest) (*protomodel.User, error) {
-	u, err := i.userService.GetByUsername(ctx, in.GetUsername())
+func (h *Handler) GetByUsername(ctx context.Context, in *protoservice.GetByUsernameRequest) (*protomodel.User, error) {
+	u, err := h.userService.GetByUsername(ctx, in.GetUsername())
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}

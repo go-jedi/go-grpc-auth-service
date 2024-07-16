@@ -9,8 +9,8 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-func (i *Implementation) Delete(ctx context.Context, in *protoservice.DeleteRequest) (*emptypb.Empty, error) {
-	if err := i.userService.Delete(ctx, in.GetId()); err != nil {
+func (h *Handler) Delete(ctx context.Context, in *protoservice.DeleteRequest) (*emptypb.Empty, error) {
+	if err := h.userService.Delete(ctx, in.GetId()); err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 

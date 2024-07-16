@@ -8,8 +8,8 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (i *Implementation) Exists(ctx context.Context, in *protoservice.ExistsRequest) (*protoservice.ExistsResponse, error) {
-	ie, err := i.userService.Exists(ctx, in.GetUsername(), in.GetEmail())
+func (h *Handler) Exists(ctx context.Context, in *protoservice.ExistsRequest) (*protoservice.ExistsResponse, error) {
+	ie, err := h.userService.Exists(ctx, in.GetUsername(), in.GetEmail())
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}

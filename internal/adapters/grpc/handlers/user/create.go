@@ -10,9 +10,8 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (i *Implementation) Update(ctx context.Context, in *protoservice.UpdateRequest) (*protomodel.User, error) {
-	dto := user.UpdateDTO{
-		ID:       in.GetId(),
+func (h *Handler) Create(ctx context.Context, in *protoservice.CreateRequest) (*protomodel.User, error) {
+	dto := user.CreateDTO{
 		Username: in.GetUsername(),
 		FullName: in.GetFullName(),
 		Email:    in.GetEmail(),
@@ -20,11 +19,11 @@ func (i *Implementation) Update(ctx context.Context, in *protoservice.UpdateRequ
 	}
 
 	// check valid dto
-	if err := i.validator.Struct(dto); err != nil {
+	if err := h.validator.Struct(dto); err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	u, err := i.userService.Update(ctx, dto)
+	u, err := h.userService.Create(ctx, dto)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
